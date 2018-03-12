@@ -13,10 +13,13 @@ For reference to official Nvidia documentation:
 
 ## Setup
 
+To clone the repo and all subrepos with it, in your terminal or git console, run the following command:
+> git clone --recursive git@github.com:asuszko/pycu_interface.git
+
 To compile the shared libraries needed, run the **setup.py** file found in the root folder from the command line, with optional argument(s) -arch, and -cc_bin if on Windows. On Windows, the NVCC compiler looks for cl.exe to compile the C/C++, which comes with Visual Studio. On Linux, it uses the built in GCC compiler. An example of a command line run to compile the code is given below:
 > python setup.py -arch=sm_50 -cc_bin="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin"
 
-If you are unable to compile, you may [download precompiled libraries here](https://github.com/asuszko/pycu_interface_libs).
+If you are unable to compile the libraries, you may [download the latest precompiled libraries here](https://github.com/asuszko/pycu_interface_libs).
 
 ## Compiler Requirements
 
@@ -30,7 +33,7 @@ After obtaining the shared libraries either by compilation or by  download, run 
 > python simple_cufft.py
 
 ## Notes
-For sample scripts or further documentation on how to use this framework to implement your own custom CUDA kernels, view the code in the repos below that import and utilize pycu_interface, and/or view the PowerPoint presentation [here](link) which provides some basic examples on how utilize this framework.
+For sample scripts or further documentation on how to use this framework to implement your own custom CUDA kernels, view the code in the repos below that import and utilize pycu_interface.
 
 - [Image Phase Correlation](https://github.com/asuszko/phase_correlation)
 - [Signal Cross Correlation](https://github.com/asuszko/signal_cross_correlation)
