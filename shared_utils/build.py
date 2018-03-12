@@ -76,6 +76,9 @@ def build(module_path, so_name, arch="sm_30", cc_bin=None):
                   libraries=["cuda", "cublas", "cufft"])
         
         #Cleanup extra compile files
-        os.chdir(lib_path)
-        os.remove(so_name+".exp")
-        os.remove(so_name+".lib")
+        filelist = glob.glob(os.path.join(lib_path, "*.exp"))
+        for f in filelist:
+            os.remove(f)
+        filelist = glob.glob(os.path.join(lib_path, "*.lib"))
+        for f in filelist:
+            os.remove(f)
