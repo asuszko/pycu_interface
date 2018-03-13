@@ -4,7 +4,7 @@ This repo is for a Python framework that provides a user with CUDA **GPU resourc
 
 # cuBLAS and cuFFT Support
 
-Functions in the cuBLAS and cuFFT objects are supported as they are needed by the user. That is, not all functions are available out of the box. When a user needs a new function, it may be added to the source in the same manner as the others are. This involves writing up a C++11 compatible wrapper (if templates are useful), that is wrapped by an 'extern C' exported function. This exported function is called in Python using the [ctypes](https://docs.python.org/3/library/ctypes.html) function library for Python.
+Functions in the cuBLAS and cuFFT objects are supported as they are needed by the user. That is, not all functions are available out of the box. When a user needs a new function, it may be added to the source in the same manner as the others are. This involves writing up a C++11 compatible wrapper (if templates are useful), that is wrapped by an 'extern C' exported function. This exported function is called in Python using the [ctypes](https://docs.python.org/3/library/ctypes.html) function library.
 
 If adding functionality to pycu_interface, fork the repo, add the new code, compile, test, and then merge request if you wish to help update master. Note that, [cuda_helpers](https://github.com/asuszko/cuda_helpers), [cublas_helpers](https://github.com/asuszko/cublas_helpers), and [cufft_helpers](https://github.com/asuszko/cufft_helpers) have their own repos, and are included as sub_modules in pycu_interface. For the current available [cuBLAS](https://github.com/asuszko/cublas_helpers) and [cuFFT](https://github.com/asuszko/cufft_helpers) routines, see their readme in their respective repos.
 
