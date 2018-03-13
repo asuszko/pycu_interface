@@ -30,6 +30,7 @@ from cublas_helpers import cublas
 from cufft_helpers.cufft import cufft
 from cuda_helpers import (cu_device_reset,
                           cu_device_props,
+                          cu_get_mem_info,
                           cu_memcpy_d2d,
                           cu_memcpy_d2h,
                           cu_memcpy_h2d,
@@ -240,6 +241,19 @@ class Device(Shared):
         """
         cu_memset(d_arr, value, nbytes)
 
+   
+    def query(self):
+        """
+        Query the device, and print information about the 
+        device name, and the amount of free and used memory.
+        """
+        free = np.array([1], dtype=np.uintp)
+        total = np.array([1], dtype=np.uintp)
+        cu_get_mem_info(free, total)
+        free_f = float(free[0])/(1024.**2)
+        total_f = float(total[0])/(1024.**2)
+        print("%s\n------------\n  Total Mem : %.2f (mb)\n  Free Mem  : %.2f (mb)"%(str(self._props.name),total_f,free_f))
+        
     
     def require_streamable(self, *args):
         """
