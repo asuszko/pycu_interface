@@ -82,7 +82,7 @@ class Stream(Shared):
         size : int
             Size of the array in bytes to copy.
         """
-        if extent is list:
+        if type(extent) is (list or tuple):
             extent = np.array(extent, dtype='i4')
         cu_memcpy_3d_async(src, dst, extent, size, self.stream)
         return
@@ -123,7 +123,6 @@ class Stream(Shared):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-
         nbytes = nbytes or arr.nbytes
         cu_memcpy_d2h_async(d_arr, arr, nbytes, self.stream)
         
@@ -208,6 +207,10 @@ class Stream(Shared):
     
     def __len__(self):
         return len(self.__dict__)
+
+
+    def __repr__(self):
+        return repr(self.__dict__)
 
 
     def __setitem__(self, key, value):

@@ -13,9 +13,11 @@ from ctypes import (cast,
 import os
 import sys
 
-sys.path.append(os.path.join(os.getcwd(),"cuda_helpers"))
-sys.path.append(os.path.join(os.getcwd(),"cublas_helpers"))
-sys.path.append(os.path.join(os.getcwd(),"cufft_helpers"))
+base_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(base_path)
+sys.path.append(os.path.join(base_path,"cuda_helpers"))
+sys.path.append(os.path.join(base_path,"cublas_helpers"))
+sys.path.append(os.path.join(base_path,"cufft_helpers"))
 
 
 # Local imports
@@ -149,8 +151,8 @@ class Device(Shared):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        if type(arr) is list:
-            nbytes = np.array(arr).nbytes
+        if type(arr) is (list or tuple):
+            nbytes = nbytes or np.array(arr).nbytes
         else:
             nbytes = nbytes or arr.nbytes
         cu_memcpy_h2d(d_arr, arr, nbytes)
@@ -174,7 +176,7 @@ class Device(Shared):
         size : int
             Size of the array in bytes to copy.
         """
-        if extent is list:
+        if type(extent) is (list or tuple):
             extent = np.array(extent, dtype='i4')
         cu_memcpy_3d(src, dst, extent, size)
         return
@@ -195,8 +197,8 @@ class Device(Shared):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        if type(arr) is list:
-            nbytes = np.array(arr).nbytes
+        if type(arr) is (list or tuple):
+            nbytes = nbytes or np.array(arr).nbytes
         else:
             nbytes = nbytes or arr.nbytes
         cu_memcpy_d2h(d_arr, arr, nbytes)
@@ -251,7 +253,7 @@ class Device(Shared):
             Arrays passed in as separate args.
         """
         for arr in args:
-            if type(arr) is list:
+            if type(arr) is (list or tuple):
                 nbytes = np.array(arr).nbytes
                 self.host_pin(arr, nbytes)
             if type(arr) is np.ndarray:
@@ -321,6 +323,10 @@ class Device(Shared):
         return self.__dict__[key]
 
 
+    def __repr__(self):
+        return repr(self.__dict__)
+
+
     def __setitem__(self, key, value):
         self.__dict__[key] = value
 
@@ -343,3 +349,4 @@ class Device(Shared):
         for i in range(len(self._pinned_arrs)):
             self.host_unpin(self._pinned_arrs[0])
         self.context.__exit__()
+        self.__dict__.clear()

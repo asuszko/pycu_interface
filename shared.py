@@ -3,6 +3,8 @@ __all__ = [
     "Shared",
 ]
 
+from functools import reduce
+from operator import mul
 import numpy as np
 from ctypes import cast, c_void_p
 
@@ -17,6 +19,7 @@ from cuda_helpers import (cu_create_channel_char,
                           cu_create_channel_float,
                           cu_malloc,
                           cu_malloc_3d)
+
 
 
 class Shared(object):
@@ -63,20 +66,24 @@ class Shared(object):
         }.get(dtype, 0)
 
 
-    def malloc(self, nbytes):
+    def malloc(self, shape, dtype):
         """
         Allocates device memory.
 
         Parameters
         ----------
-        nbytes : int
-            Size to allocate in bytes.
+        shape : tuple
+            The shape of the array to allocate.
+            
+        dtype : np.dtype
+            That data type of the array.
             
         Returns
         -------
         dev_ptr: c_void_p
             Pointer to allocated device memory.
         """
+        nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
         dev_ptr = cu_malloc(nbytes)
         dev_ptr = cast(dev_ptr, c_void_p)
         return dev_ptr
@@ -92,8 +99,9 @@ class Shared(object):
         nbytes : int
             Size to allocate in bytes.
         
-        extent : list or np.ndarray
-            The extent or dimensions of the array [x,y,z].
+        extent : list, 1d np.ndarray, or tuple
+            The extent or dimensions of the array.
+            Format: (nx,ny,nz,...)
             
         layered : bool, optional
             Layered array flag.
@@ -108,7 +116,7 @@ class Shared(object):
         Setting the layered flag to True will turn a 3D 
         array into a 2D layered array.
         """
-        if extent is list:
+        if type(extent) is (list or tuple):
             extent = np.array(extent, dtype='i4')
         dev_ptr = cu_malloc_3d(channel, extent, layered)
         dev_ptr = cast(dev_ptr, c_void_p)
