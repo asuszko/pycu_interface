@@ -18,7 +18,8 @@ from cuda_helpers import (cu_create_channel_char,
                           cu_create_channel_short,
                           cu_create_channel_float,
                           cu_malloc,
-                          cu_malloc_3d)
+                          cu_malloc_3d,
+                          cu_malloc_managed)
 
 
 
@@ -121,3 +122,30 @@ class Shared(object):
         dev_ptr = cu_malloc_3d(channel, extent, layered)
         dev_ptr = cast(dev_ptr, c_void_p)
         return dev_ptr
+    
+    
+    def malloc_unified(self, shape, dtype):
+        """
+        Allocates unified memory.
+
+        Parameters
+        ----------
+        shape : tuple
+            The shape of the array to allocate.
+            
+        dtype : np.dtype
+            That data type of the array.
+            
+        Returns
+        -------
+        arr : np.ndarray
+            Unified memory space represented by the host 
+            portion as a NumPy array.
+        """        
+        nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
+        dev_ptr = cu_malloc_managed(nbytes)
+        arr = np.ctypeslib.as_array(cast(dev_ptr,
+                                         np.ctypeslib.ndpointer(dtype,
+                                                                shape=shape,
+                                                                flags='C')))
+        return arr
