@@ -57,12 +57,3 @@ class Mapping():
 
     def __iter__(self):
         return iter(self.__dict__)
-
-
-
-o = Mapping(h=1,b='c')
-o.foo = "bar"
-o['lumberjack'] = 'foo'
-o.update({'a': 'b'}, c=44)
-print('lumberjack' in o)
-print(o)

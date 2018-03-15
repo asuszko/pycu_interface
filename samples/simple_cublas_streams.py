@@ -48,8 +48,8 @@ with Device(n_streams=nstreams) as d:
     ## Mallocs are always synchronous, and should be done in their own loop to
     ## avoid synchorizing the otherwise async stream methods
     for s in d.streams:
-        s.a = s.malloc(a[0].size*a.itemsize)
-        s.b = s.malloc(b[0].size*b.itemsize)
+        s.a = s.malloc(a[0].shape, a.dtype)
+        s.b = s.malloc(b[0].shape, b.dtype)
 
     # Running the stream async operations    
     for stream_id,s in enumerate(d.streams):

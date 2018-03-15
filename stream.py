@@ -195,23 +195,3 @@ class Stream(Shared):
     @property
     def stream(self):
         return self._stream
-
-
-    def __contains__(self, key):
-        return key in self.__dict__
-
-
-    def __getitem__(self, key):
-        return self.__dict__[key]
-    
-    
-    def __len__(self):
-        return len(self.__dict__)
-
-
-    def __repr__(self):
-        return repr(self.__dict__)
-
-
-    def __setitem__(self, key, value):
-        self.__dict__[key] = value

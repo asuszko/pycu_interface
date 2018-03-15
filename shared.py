@@ -20,10 +20,10 @@ from cuda_helpers import (cu_create_channel_char,
                           cu_malloc,
                           cu_malloc_3d,
                           cu_malloc_managed)
+from shared_utils.mapping import Mapping
 
 
-
-class Shared(object):
+class Shared(Mapping):
 
     def __init__(self):
         """
@@ -36,7 +36,7 @@ class Shared(object):
         thread host blocking behavior and break the asynchronous 
         stream operation.
         """
-        pass
+        super(Mapping, self).__init__()
 
 
     def create_channel(self, dtype, components=1, unsigned=False):
@@ -149,4 +149,4 @@ class Shared(object):
                                                                 shape=shape,
                                                                 flags='C')))
         dev_ptr = cast(dev_ptr, c_void_p)
-        return {"h":arr, "d":dev_ptr}
+        return Mapping(h=arr, d=dev_ptr)

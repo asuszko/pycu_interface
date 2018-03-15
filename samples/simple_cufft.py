@@ -37,10 +37,10 @@ with Device() as d:
     d.r2c_plan = d.cufft.plan(fft_extent, 'cufft_r2c')              #fft r2c plan single precision (double = cufft_d2z)
     d.c2c_plan = d.cufft.plan(fft_extent, 'cufft_c2c')              #fft c2c plan single precision (double = cufft_z2z)
 
-    d.gray = d.malloc(gray.size*gray.itemsize)                      #Space of input data
-    d.r2c_res = d.malloc((nx//2+1)*ny*gray.itemsize*2)              #Space for r2c result
-    d.r2c_full= d.malloc(nx*ny*gray.itemsize*2)                     #Space for full rest
-    d.c2c_res = d.malloc(nx*ny*gray.itemsize*2)                     #space for c2c result
+    d.gray = d.malloc(gray.shape,gray.dtype)                        #Space of input data
+    d.r2c_res = d.malloc((ny,(nx//2+1)),'c8')                       #Space for r2c result
+    d.r2c_full= d.malloc((ny,nx),'c8')                              #Space for full rest
+    d.c2c_res = d.malloc((ny,nx),'c8')                              #space for c2c result
      
     d.memcpy_h2d(d.gray, gray)                                      #Copy input data to device
     d.cufft.r2c(d.r2c_plan, d.gray, d.r2c_res)                      #r2c fft
