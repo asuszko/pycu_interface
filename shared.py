@@ -148,4 +148,5 @@ class Shared(object):
                                          np.ctypeslib.ndpointer(dtype,
                                                                 shape=shape,
                                                                 flags='C')))
-        return arr
+        dev_ptr = cast(dev_ptr, c_void_p)
+        return {"h":arr, "d":dev_ptr}
