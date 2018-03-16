@@ -33,7 +33,14 @@ On Linux, the command would be the same, with the -cc_bin argument omitted. If y
 After obtaining the shared libraries either by compilation or by [download](https://github.com/asuszko/pycu_interface_libs), run any of the sample scripts located from within the samples folder, for example:
 > python simple_cufft.py
 
+## Troubleshooting
+
+Known error messages and causes:
+> GPUassert: invalid device symbol
+You are using a shared library that was compiled using a compute architecture that your hardware does not support. Recompile or download libraries that use an older architecture.
+
 ## Notes
+
 For sample scripts or further documentation on how to use this framework to implement your own custom CUDA kernels, view the code in the repos below that import and utilize pycu_interface. The codes below are simple examples that show how to utilize the device object for **optimal** GPU resource management, and custom CUDA kernel calls to accelerate the Python. More details and tutorials on how to use this framework optimally are in the works. 
 
 - [Image Phase Correlation](https://github.com/asuszko/phase_correlation)
