@@ -8,7 +8,7 @@ __all__ = [
     "Mapping"
 ]
 
-class Mapping():
+class Mapping(dict):
    
     def __init__(self, **kwargs):
         for k,v in kwargs.items():

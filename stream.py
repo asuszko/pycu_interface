@@ -18,7 +18,7 @@ from cuda_helpers import (cu_memcpy_3d_async,
                           cu_sync_stream)
 
 
-class Stream(Shared):
+class Stream(Shared, object):
 
     def __init__(self, device, stream_id):
         """

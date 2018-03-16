@@ -18,7 +18,7 @@ from cuda_helpers import (cu_create_channel_char,
 from shared_utils import Mapping
 
 
-class Shared(Mapping):
+class Shared(Mapping, object):
 
     def __init__(self):
         """

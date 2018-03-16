@@ -31,7 +31,7 @@ from cuda_helpers import (cu_device_reset,
                           cu_sync_device)
 
 
-class Device(Shared):
+class Device(Shared, object):
 
     def __init__(self, device_id=0, n_streams=0):
         """

@@ -24,7 +24,7 @@ On Linux, the command would be the same, with the -cc_bin argument omitted. If y
 
 ## Compiler Requirements
 
-- Python 3.6.x (2.7 compatibility not yet tested - so YMMV with 2.7 for now) 
+- Python 2.7.14 or 3.6.4 (YMMW with other releases)
 - The latest  version of the [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit)
 - (Windows) Visual Studio 2013 Professional, or any compatible version with your version of CUDA Toolkit. Note: You can download a trial of Professional to obtain cl.exe. Compilation via the command line will still work after the trial period has ended.
 
