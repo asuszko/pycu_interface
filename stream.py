@@ -5,8 +5,10 @@ __all__ = [
 
 import numpy as np
 
+
 # Local imports
-from shared import Shared
+from shared import (get_nbytes,
+                    Shared)            #Shared calls between Device and Stream
 from cublas_helpers import cublas
 from cufft_helpers.cufft import cufft
 from cuda_helpers import (cu_memcpy_3d_async,
@@ -115,7 +117,7 @@ class Stream(Shared, object):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        nbytes = nbytes or arr.nbytes
+        nbytes = get_nbytes(arr, nbytes)
         cu_memcpy_d2h_async(d_arr, arr, nbytes, self.stream)
         
 
@@ -134,7 +136,7 @@ class Stream(Shared, object):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        nbytes = nbytes or arr.nbytes
+        nbytes = get_nbytes(arr, nbytes)
         cu_memcpy_h2d_async(d_arr, arr, nbytes, self.stream)
 
   

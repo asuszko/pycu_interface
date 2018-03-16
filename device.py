@@ -11,9 +11,10 @@ from ctypes import (cast,
 
 
 # Local imports
-from cuctx import cuCtx      #Context specific calls
-from shared import Shared    #Shared calls between Device and Stream
-from stream import Stream    #Stream specific calls
+from cuctx import cuCtx                #Context specific calls
+from shared import (get_nbytes,
+                    Shared)            #Shared calls between Device and Stream
+from stream import Stream              #Stream specific calls
 
 
 from cublas_helpers import cublas
@@ -96,7 +97,7 @@ class Device(Shared, object):
         nbytes : int, optional
             Size to pin in bytes. If None, the whole array is pinned.
         """   
-        nbytes = nbytes or arr.nbytes
+        nbytes = get_nbytes(arr, nbytes)
         if type(arr) in [list,np.ndarray]:
             cu_mempin(arr.ctypes.data_as(c_void_p), nbytes)
         else:
@@ -142,10 +143,7 @@ class Device(Shared, object):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        if type(arr) is (list or tuple):
-            nbytes = nbytes or np.array(arr).nbytes
-        else:
-            nbytes = nbytes or arr.nbytes
+        nbytes = get_nbytes(arr, nbytes)
         cu_memcpy_h2d(d_arr, arr, nbytes)
 
 
@@ -188,10 +186,7 @@ class Device(Shared, object):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        if type(arr) is (list or tuple):
-            nbytes = nbytes or np.array(arr).nbytes
-        else:
-            nbytes = nbytes or arr.nbytes
+        nbytes = get_nbytes(arr, nbytes)
         cu_memcpy_d2h(d_arr, arr, nbytes)
 
 
@@ -257,14 +252,12 @@ class Device(Shared, object):
             Arrays passed in as separate args.
         """
         for arr in args:
-            if type(arr) is (list or tuple):
-                nbytes = np.array(arr).nbytes
-                self.host_pin(arr, nbytes)
             if type(arr) is np.ndarray:
-                arr = np.require(arr, requirements="C")
+                if not arr.flags['C_CONTIGUOUS']:
+                    arr = np.require(arr, requirements="C")
                 self.host_pin(arr)
             else:
-                self.host_pin(arr, sizeof(arr))
+                self.host_pin(arr, sizeof(arr)) #c-types struct/object
 
         
     def reset(self):

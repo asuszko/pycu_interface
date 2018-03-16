@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 __all__ = [
+    "get_nbytes",
     "Shared",
 ]
 
@@ -7,6 +8,7 @@ from functools import reduce
 from operator import mul
 import numpy as np
 from ctypes import cast, c_void_p
+import warnings
 
 # Local imports
 from cuda_helpers import (cu_create_channel_char,
@@ -16,6 +18,19 @@ from cuda_helpers import (cu_create_channel_char,
                           cu_malloc_3d,
                           cu_malloc_managed)
 from shared_utils import Mapping
+
+
+def check_contiguous(arr):
+    if not arr.flags['C_CONTIGUOUS'] and not arr.flags['F_CONTIGUOUS']:
+        warnings.warn("Non-contiguous host memory detected, unexpected behavior/results may occur")
+
+def get_nbytes(arr, nbytes=None):
+    if type(arr) is (list or tuple):
+        nbytes = nbytes or np.array(arr).nbytes
+    else:
+        nbytes = nbytes or arr.nbytes
+        check_contiguous(arr)
+    return nbytes
 
 
 class Shared(Mapping, object):
