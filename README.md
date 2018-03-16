@@ -37,6 +37,7 @@ After obtaining the shared libraries either by compilation or by [download](http
 
 Known error messages and causes:
 > GPUassert: invalid device symbol
+
 You are using a shared library that was compiled using a compute architecture that your hardware does not support. Recompile or download libraries that use an older architecture.
 
 ## Notes
