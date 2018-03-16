@@ -4,14 +4,6 @@ __all__ = [
 ]
 
 import numpy as np
-from ctypes import cast, c_void_p
-
-# Path must be appended for Python 3.x
-import os
-import sys
-sys.path.append(os.path.join(os.getcwd(),"cuda_helpers"))
-sys.path.append(os.path.join(os.getcwd(),"cublas_helpers"))
-sys.path.append(os.path.join(os.getcwd(),"cufft_helpers"))
 
 # Local imports
 from shared import Shared

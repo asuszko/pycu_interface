@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Obtained from:
+Mostly obtained from:
     https://stackoverflow.com/questions/4014621/a-python-class-that-acts-like-dict
 """
+
+__all__ = [
+    "Mapping"
+]
 
 class Mapping():
    

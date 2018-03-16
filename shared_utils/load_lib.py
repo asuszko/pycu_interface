@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
+__all__ = [
+    "load_lib"
+]
+
 import platform
 from numpy.ctypeslib import load_library
+
 
 def load_lib(lib_path, lib_fname):
     """

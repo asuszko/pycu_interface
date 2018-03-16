@@ -7,7 +7,6 @@ from collections import Iterable
 
 # Local imports
 from device import Device
-from cu_helpers import cu_sync_device
 
 
 class Devices(Iterable):

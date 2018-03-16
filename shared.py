@@ -8,11 +8,6 @@ from operator import mul
 import numpy as np
 from ctypes import cast, c_void_p
 
-# Path must be appended for Python 3.x
-import os
-import sys
-sys.path.append(os.path.join(os.getcwd(),"cuda_helpers"))
-
 # Local imports
 from cuda_helpers import (cu_create_channel_char,
                           cu_create_channel_short,
@@ -20,7 +15,7 @@ from cuda_helpers import (cu_create_channel_char,
                           cu_malloc,
                           cu_malloc_3d,
                           cu_malloc_managed)
-from shared_utils.mapping import Mapping
+from shared_utils import Mapping
 
 
 class Shared(Mapping):
@@ -84,7 +79,10 @@ class Shared(Mapping):
         dev_ptr: c_void_p
             Pointer to allocated device memory.
         """
-        nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
+        try:
+            nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
+        except:
+            nbytes = shape*np.dtype(dtype).itemsize
         dev_ptr = cu_malloc(nbytes)
         dev_ptr = cast(dev_ptr, c_void_p)
         return dev_ptr
@@ -141,8 +139,11 @@ class Shared(Mapping):
         arr : np.ndarray
             Unified memory space represented by the host 
             portion as a NumPy array.
-        """        
-        nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
+        """
+        try:
+            nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
+        except:
+            nbytes = shape*np.dtype(dtype).itemsize
         dev_ptr = cu_malloc_managed(nbytes)
         arr = np.ctypeslib.as_array(cast(dev_ptr,
                                          np.ctypeslib.ndpointer(dtype,

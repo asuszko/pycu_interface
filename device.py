@@ -9,16 +9,6 @@ from ctypes import (cast,
                     pointer,
                     sizeof)
 
-# Path must be appended for Python 3.x
-import os
-import sys
-
-base_path = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(base_path)
-sys.path.append(os.path.join(base_path,"cuda_helpers"))
-sys.path.append(os.path.join(base_path,"cublas_helpers"))
-sys.path.append(os.path.join(base_path,"cufft_helpers"))
-
 
 # Local imports
 from cuctx import cuCtx      #Context specific calls
