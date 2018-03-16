@@ -3,6 +3,11 @@
 # Directories #
 
 
+# Files #
+#########
+devices.py
+
+
 # Datasets #
 ############
 *.npy
