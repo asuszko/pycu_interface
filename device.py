@@ -22,13 +22,8 @@ from cufft_helpers.cufft import cufft
 from cuda_helpers import (cu_device_reset,
                           cu_device_props,
                           cu_get_mem_info,
-                          cu_memcpy_d2d,
-                          cu_memcpy_d2h,
-                          cu_memcpy_h2d,
-                          cu_memcpy_3d,
                           cu_mempin,
                           cu_memunpin,
-                          cu_memset,
                           cu_sync_device)
 
 
@@ -127,105 +122,6 @@ class Device(Shared, object):
             else:
                 print("Exception: Array not found in pinned memory")
         
- 
-    def memcpy_h2d(self, d_arr, arr, nbytes=None):
-        """
-        Copy contiguous memory from the host to the device.
-
-        Parameters
-        ----------
-        d_arr : c_void_p
-            Device pointer reference.
-
-        arr : list or np.ndarray
-            Host array.
-
-        nbytes : int, optional
-            Size to transfer in bytes.
-        """
-        nbytes = get_nbytes(arr, nbytes)
-        cu_memcpy_h2d(d_arr, arr, nbytes)
-
-
-    def memcpy_3d(self, src, dst, extent, size):
-        """
-        Copy a CUDA array.
-
-        Parameters
-        ----------
-        src_arr : c_void_p
-            Pointer of the source array to copy.
-
-        d_arr : c_void_p
-            Pointer of the destination array.
-            
-        extent : list or ndarray
-            Dimensions of the array to copy [x,y,z].
-
-        size : int
-            Size of the array in bytes to copy.
-        """
-        if type(extent) is (list or tuple):
-            extent = np.array(extent, dtype='i4')
-        cu_memcpy_3d(src, dst, extent, size)
-        return
-
- 
-    def memcpy_d2h(self, arr, d_arr, nbytes=None):
-        """
-        Copy contiguous memory from the device to the host.
-
-        Parameters
-        ----------
-        arr : list or np.ndarray
-            Host array.
-
-        d_arr : c_void_p
-            Device pointer reference.
-
-        nbytes : int, optional
-            Size to transfer in bytes.
-        """
-        nbytes = get_nbytes(arr, nbytes)
-        cu_memcpy_d2h(d_arr, arr, nbytes)
-
-
-    def memcpy_d2d(self, src_arr, dst_arr, nbytes):
-        """
-        Copy memory from device to device. This works both 
-        for copying memory to a separate device, or creating a 
-        copy of memory on the same device.
-
-        Parameters
-        ----------
-        src_arr : c_void_p
-            Pointer of the source array to copy.
-
-        d_arr : c_void_p
-            Pointer of the destination array.
-
-        nbytes : int
-            Size to copy/transfer in bytes.
-        """
-        cu_memcpy_d2d(src_arr, dst_arr, nbytes)
-        
-    
-    def memset(self, d_arr, value, nbytes):
-        """
-        Set the value of the memory. Currently, the only values that 
-        are 'obvious' to set are 0, and -1. Otherwise, other values 
-        must set in hex.
-
-        Parameters
-        ----------
-        d_arr : c_void_p
-            Pointer of the memory on the device to set.
-
-        nbytes : int
-            Size to set in bytes.
-        """
-        cu_memset(d_arr, value, nbytes)
-
    
     def query(self):
         """
@@ -326,4 +222,4 @@ class Device(Shared, object):
         for i in range(len(self._pinned_arrs)):
             self.host_unpin(self._pinned_arrs[0])
         self.context.__exit__()
-        self.__dict__.clear()
+        self.clear()

@@ -15,7 +15,7 @@ For reference to official Nvidia documentation:
 ## Setup
 
 To clone the repo and all subrepos with it, in your terminal or git console, run the following command:
-> git clone --recursive https://github.com/asuszko/pycu_interface.git
+> git clone --recursive git@github.com:asuszko/pycu_interface.git
 
 To compile the shared libraries needed, run the **setup.py** file found in the root folder from the command line, with optional argument(s) -arch, and -cc_bin if on Windows. On Windows, the NVCC compiler looks for cl.exe to compile the C/C++ code. cl.exe comes with Visual Studio. On Linux, it uses the built in gcc compiler. An example of a command line run (on Windows) to compile the code is given below:
 > python setup.py -arch=sm_50 -cc_bin="C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin"
@@ -24,7 +24,7 @@ On Linux, the command would be the same, with the -cc_bin argument omitted. If y
 
 ## Compiler Requirements
 
-- Python 2.7.14 or 3.6.4 (YMMV with other releases)
+- Python 2.7.14 or 3.6.4 (YMMW with other releases)
 - The latest  version of the [Nvidia CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit)
 - (Windows) Visual Studio 2013 Professional, or any compatible version with your version of CUDA Toolkit. Note: You can download a trial of Professional to obtain cl.exe. Compilation via the command line will still work after the trial period has ended.
 

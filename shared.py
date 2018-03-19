@@ -17,19 +17,17 @@ from cuda_helpers import (cu_create_channel_char,
                           cu_malloc,
                           cu_malloc_3d,
                           cu_malloc_managed)
+from dev_ptr import Device_Ptr
 from shared_utils import Mapping
 
 
-def check_contiguous(arr):
-    if not arr.flags['C_CONTIGUOUS'] and not arr.flags['F_CONTIGUOUS']:
-        warnings.warn("Non-contiguous host memory detected, unexpected behavior/results may occur")
+
 
 def get_nbytes(arr, nbytes=None):
-    if type(arr) is (list or tuple):
+    if type(arr) in [list or tuple]:
         nbytes = nbytes or np.array(arr).nbytes
     else:
         nbytes = nbytes or arr.nbytes
-        check_contiguous(arr)
     return nbytes
 
 
@@ -77,7 +75,7 @@ class Shared(Mapping, object):
         }.get(dtype, 0)
 
 
-    def malloc(self, shape, dtype):
+    def malloc(self, shape, dtype, stream=None):
         """
         Allocates device memory.
 
@@ -88,6 +86,9 @@ class Shared(Mapping, object):
             
         dtype : np.dtype
             That data type of the array.
+            
+        stream: c_void_p
+            CUDA stream to associate the returned object with.
             
         Returns
         -------
@@ -100,7 +101,7 @@ class Shared(Mapping, object):
             nbytes = shape*np.dtype(dtype).itemsize
         dev_ptr = cu_malloc(nbytes)
         dev_ptr = cast(dev_ptr, c_void_p)
-        return dev_ptr
+        return Device_Ptr(dev_ptr, shape, dtype, stream)
 
 
     def malloc_3d(self, channel, extent, layered=False):
@@ -130,7 +131,7 @@ class Shared(Mapping, object):
         Setting the layered flag to True will turn a 3D 
         array into a 2D layered array.
         """
-        if type(extent) is (list or tuple):
+        if type(extent) in [list, tuple]:
             extent = np.array(extent, dtype='i4')
         dev_ptr = cu_malloc_3d(channel, extent, layered)
         dev_ptr = cast(dev_ptr, c_void_p)

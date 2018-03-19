@@ -24,22 +24,21 @@ sys.path.append("..")
 from device import Device
 
 vec_len = 20
-nstreams = 2
+streams = 2
 
 # Sample data
-a = np.arange(0,vec_len,1).reshape(nstreams,vec_len//nstreams).astype('f4')
+a = np.arange(0,vec_len,1).reshape(streams,vec_len//streams).astype('f4')
 b = np.ones(a.shape,a.dtype)
-n = len(a[0])
 
 # Pre allocated space for the result
 c = np.empty(a.shape,a.dtype)
-nrms = np.empty(nstreams,a.dtype)
+nrms = np.empty(streams,a.dtype)
 
 # Scaling factor that the cuBLAS routine called later uses
-alpha = np.full(1,2,dtype=a.dtype)
+alpha = 2.
 
 # Initialize the Device object on the default device(0) with 2 streams
-with Device(n_streams=nstreams) as d:
+with Device(n_streams=streams) as d:
     
     # If using streams, relevant host memory needs to be pinned for async operation 
     d.require_streamable(a,b,c)
@@ -48,17 +47,18 @@ with Device(n_streams=nstreams) as d:
     ## Mallocs are always synchronous, and should be done in their own loop to
     ## avoid synchorizing the otherwise async stream methods
     for s in d.streams:
-        s.a = s.malloc(a[0].shape, a.dtype)
-        s.b = s.malloc(b[0].shape, b.dtype)
+        stream = s.stream
+        s.a = s.malloc(a[0].shape, a.dtype, stream)
+        s.b = s.malloc(b[0].shape, b.dtype, stream)
 
     # Running the stream async operations    
-    for stream_id,s in enumerate(d.streams):
-        s.memcpy_h2d_async(s.a,a[stream_id])
-        s.memcpy_h2d_async(s.b,b[stream_id])
-        s.cublas.axpy(n, alpha, s.a, s.b)                        #ax plus y
-        s.cublas.scal(n, alpha, s.b)                             #scale matrix by alpha
-        s.memcpy_d2h_async(c[stream_id], s.b)                    #copy result back to host
-        nrms[stream_id] = s.cublas.nrm2(n, s.b, dtype='f4')      #norm (result is automatically copied back to host)
+    for stream_id, s in enumerate(d.streams):
+        s.a.h2d_async(a[stream_id])
+        s.b.h2d_async(b[stream_id])
+        s.cublas.axpy(alpha, s.a, s.b)            #ax plus y
+        s.cublas.scal(alpha, s.b)                 #scale matrix by alpha
+        s.b.d2h_async(c[stream_id])               #copy result back to host
+        nrms[stream_id] = s.cublas.nrm2(s.b)      #norm (result is automatically copied back to host)
         s.sync()
 
 
