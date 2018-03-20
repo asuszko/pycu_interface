@@ -14,7 +14,7 @@ For reference to official Nvidia documentation:
 
 ## Setup
 
-To clone the repo and all subrepos with it, in your terminal or git console, run the following command:
+To clone the repo and all subrepos with it, in your terminal or [Git console](https://gitforwindows.org/), run the following command:
 > git clone --recursive git@github.com:asuszko/pycu_interface.git
 
 To compile the shared libraries needed, run the **setup.py** file found in the root folder from the command line, with optional argument(s) -arch, and -cc_bin if on Windows. On Windows, the NVCC compiler looks for cl.exe to compile the C/C++ code. cl.exe comes with Visual Studio. On Linux, it uses the built in gcc compiler. An example of a command line run (on Windows) to compile the code is given below:
