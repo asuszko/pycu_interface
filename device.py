@@ -133,7 +133,7 @@ class Device(Shared, object):
         cu_get_mem_info(free, total)
         free_f = float(free[0])/(1024.**2)
         total_f = float(total[0])/(1024.**2)
-        print("%s\n------------\n  Total Mem : %.2f (mb)\n  Free Mem  : %.2f (mb)"%(self._props.name,total_f,free_f))
+        print("%s\n------------\n  Total Mem : %.2f (mb)\n  Free  Mem : %.2f (mb)"%(self._props.name,total_f,free_f))
         
     
     def require_streamable(self, *args):

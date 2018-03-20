@@ -75,7 +75,7 @@ class Shared(Mapping, object):
         }.get(dtype, 0)
 
 
-    def malloc(self, shape, dtype, stream=None):
+    def malloc(self, shape, dtype, stream=None, default=None):
         """
         Allocates device memory.
 
@@ -101,7 +101,20 @@ class Shared(Mapping, object):
             nbytes = shape*np.dtype(dtype).itemsize
         dev_ptr = cu_malloc(nbytes)
         dev_ptr = cast(dev_ptr, c_void_p)
-        return Device_Ptr(dev_ptr, shape, dtype, stream)
+        d = Device_Ptr(dev_ptr, shape, dtype, stream)
+        
+        if default is not None:
+            if isinstance(default, (int, float, complex)):
+                d.h2d(np.full(shape, default, dtype=dtype))
+            elif type(default) in [list,tuple]:
+                tmp_arr = np.array(default, dtype=dtype)
+                d.h2d(tmp_arr, tmp_arr.nbytes)
+            else:
+                if default.dtype != np.dtype(dtype):
+                    default = default.astype(dtype)
+                    warnings.warn("Data type mismatch between default dtype and device array dtype... forcing device dtype.")
+                d.h2d(default, default.nbytes)
+        return d
 
 
     def malloc_3d(self, channel, extent, layered=False):

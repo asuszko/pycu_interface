@@ -47,12 +47,20 @@ class Device_Ptr(object):
         self.nbytes = self.size*np.dtype(dtype).itemsize
     
     
+    def __call__(self):
+        return self.ptr
+    
+    
     def __len__(self):
         return self.size
 
 
     def __repr__(self):
         return repr(self.__dict__)
+    
+    
+    def _harray(self):
+        return np.empty(self.shape, self.dtype)
 
 
     def T(self, stream=None):
@@ -91,7 +99,7 @@ class Device_Ptr(object):
         cu_memcpy_d2d(self.ptr, dst_arr, nbytes)
         
 
-    def d2h(self, arr, nbytes=None):
+    def d2h(self, arr=None, nbytes=None):
         """
         Copy contiguous memory from the device to the host.
 
@@ -102,10 +110,28 @@ class Device_Ptr(object):
 
         nbytes : int, optional
             Size to transfer in bytes.
+            
+        Returns, optional
+        -------
+        tmp_arr : np.ndarray
+            Returns the array from the device to newly allocated 
+            existing memory, if none was passed in. Otherwise 
+            the copy is done to arr.
+            
+        Notes
+        -----
+        Having arr created and pinned long beforehand will improve 
+        overall performance. Using arr=None should only be used for 
+        development, testing, and debugging purposes.
         """
         nbytes = nbytes or self.nbytes
-        check_contiguous(arr)
-        cu_memcpy_d2h(self.ptr, arr, nbytes)
+        if arr is not None:
+            check_contiguous(arr)
+            cu_memcpy_d2h(self.ptr, arr, nbytes)
+        else:
+            tmp_arr = self._harray()
+            cu_memcpy_d2h(self.ptr, tmp_arr, nbytes)
+            return tmp_arr
             
     
     def h2d(self, arr, nbytes=None):
@@ -147,7 +173,7 @@ class Device_Ptr(object):
         cu_memcpy_d2d_async(self.ptr, dst_arr, nbytes, stream)
 
 
-    def d2h_async(self, arr, stream=None, nbytes=None):
+    def d2h_async(self, arr=None, stream=None, nbytes=None):
         """
         Copy contiguous memory from the device to the host.
 
@@ -161,13 +187,32 @@ class Device_Ptr(object):
         
         nbytes : int, optional
             Size to transfer in bytes.
+            
+        Returns, optional
+        -------
+        tmp_arr : np.ndarray
+            Returns the array from the device to newly allocated 
+            existing memory, if none was passed in. Otherwise 
+            the copy is done to arr.
+            
+        Notes
+        -----
+        Having arr created and pinned long beforehand will improve 
+        overall performance. Using arr=None should only be used for 
+        development, testing, and debugging purposes.
         """
         nbytes = nbytes or self.nbytes
         stream = stream or self.stream
-        check_contiguous(arr)
-        cu_memcpy_d2h_async(self.ptr, arr, nbytes, stream)
-        
-        
+    
+        if arr is not None:
+            check_contiguous(arr)
+            cu_memcpy_d2h_async(self.ptr, arr, nbytes, stream)
+        else:
+            tmp_arr = self._harray()
+            cu_memcpy_d2h_async(self.ptr, arr, nbytes, stream)
+            return tmp_arr
+
+                
     def h2d_async(self, arr, stream=None, nbytes=None):
         """
         Copy contiguous memory from the host to the device.

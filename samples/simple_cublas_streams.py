@@ -31,7 +31,6 @@ a = np.arange(0,vec_len,1).reshape(streams,vec_len//streams).astype('f4')
 b = np.ones(a.shape,a.dtype)
 
 # Pre allocated space for the result
-c = np.empty(a.shape,a.dtype)
 nrms = np.empty(streams,a.dtype)
 
 # Scaling factor that the cuBLAS routine called later uses
@@ -41,7 +40,7 @@ alpha = 2.
 with Device(n_streams=streams) as d:
     
     # If using streams, relevant host memory needs to be pinned for async operation 
-    d.require_streamable(a,b,c)
+    d.require_streamable(a,b)
     
     # Allocate device memory for each stream to use, and return their references
     ## Mallocs are always synchronous, and should be done in their own loop to
@@ -57,7 +56,6 @@ with Device(n_streams=streams) as d:
         s.b.h2d_async(b[stream_id])
         s.cublas.axpy(alpha, s.a, s.b)            #ax plus y
         s.cublas.scal(alpha, s.b)                 #scale matrix by alpha
-        s.b.d2h_async(c[stream_id])               #copy result back to host
         nrms[stream_id] = s.cublas.nrm2(s.b)      #norm (result is automatically copied back to host)
         s.sync()
 
