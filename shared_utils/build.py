@@ -12,7 +12,7 @@ import subprocess
 
 def nvcc_call(wd, name, sources,
               arch="sm_30",
-              compile_args=["-m64", "-Xcompiler", "-std=c++l4"],
+              compile_args=["-m64", "-Xcompiler", "-std=c++11"],
               cc_bin=None,
               include_dirs=[],
               library_dirs=[],
