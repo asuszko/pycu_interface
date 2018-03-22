@@ -105,15 +105,15 @@ class Shared(Mapping, object):
         
         if default is not None:
             if isinstance(default, (int, float, complex)):
-                d.h2d(np.full(shape, default, dtype=dtype))
+                d.to_device(np.full(shape, default, dtype=dtype))
             elif type(default) in [list,tuple]:
                 tmp_arr = np.array(default, dtype=dtype)
-                d.h2d(tmp_arr, tmp_arr.nbytes)
+                d.to_device(tmp_arr, tmp_arr.nbytes)
             else:
                 if default.dtype != np.dtype(dtype):
                     default = default.astype(dtype)
                     warnings.warn("Data type mismatch between default dtype and device array dtype... forcing device dtype.")
-                d.h2d(default, default.nbytes)
+                d.to_device(default, default.nbytes)
         return d
 
 
@@ -151,7 +151,7 @@ class Shared(Mapping, object):
         return dev_ptr
     
     
-    def malloc_unified(self, shape, dtype):
+    def malloc_unified(self, shape, dtype, default=None):
         """
         Allocates unified memory.
 
@@ -179,4 +179,17 @@ class Shared(Mapping, object):
                                                                 shape=shape,
                                                                 flags='C')))
         dev_ptr = cast(dev_ptr, c_void_p)
-        return Mapping(h=arr, d=dev_ptr)
+        d = Device_Ptr(dev_ptr, shape, dtype)
+        
+        if default is not None:
+            if isinstance(default, (int, float, complex)):
+                d.to_device(np.full(shape, default, dtype=dtype))
+            elif type(default) in [list,tuple]:
+                tmp_arr = np.array(default, dtype=dtype)
+                d.to_device(tmp_arr, tmp_arr.nbytes)
+            else:
+                if default.dtype != np.dtype(dtype):
+                    default = default.astype(dtype)
+                    warnings.warn("Data type mismatch between default dtype and device array dtype... forcing device dtype.")
+                d.to_device(default, default.nbytes)
+        return Mapping(h=arr, d=d)

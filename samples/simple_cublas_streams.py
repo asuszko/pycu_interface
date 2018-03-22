@@ -33,9 +33,6 @@ b = np.ones(a.shape,a.dtype)
 # Pre allocated space for the result
 nrms = np.empty(streams,a.dtype)
 
-# Scaling factor that the cuBLAS routine called later uses
-alpha = 2.
-
 # Initialize the Device object on the default device(0) with 2 streams
 with Device(n_streams=streams) as d:
     
@@ -52,10 +49,10 @@ with Device(n_streams=streams) as d:
 
     # Running the stream async operations    
     for stream_id, s in enumerate(d.streams):
-        s.a.h2d_async(a[stream_id])
-        s.b.h2d_async(b[stream_id])
-        s.cublas.axpy(alpha, s.a, s.b)            #ax plus y
-        s.cublas.scal(alpha, s.b)                 #scale matrix by alpha
+        s.a.to_device_async(a[stream_id])
+        s.b.to_device_async(b[stream_id])
+        s.cublas.axpy(2., s.a, s.b)            #ax plus y
+        s.cublas.scal(2., s.b)                 #scale matrix by alpha
         nrms[stream_id] = s.cublas.nrm2(s.b)      #norm (result is automatically copied back to host)
         s.sync()
 

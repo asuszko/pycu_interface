@@ -45,9 +45,9 @@ with Device() as d:
     d.cufft.add_redundants(d.r2c_plan, d.r2c_res, d.r2c_full)       #Fills in the redundant values
     d.cufft.c2c(d.c2c_plan, d.r2c_full, d.c2c_res, 'cufft_inverse') #c2c fft
      
-    d.cublas.scal(1./gray.size, d.c2c_res)                        #Scale c2c result using cuBLAS
+    d.cublas.scal(1./gray.size, d.c2c_res)                          #Scale c2c result using cuBLAS
     
-    result = d.c2c_res.d2h()                                      #Copy scaled c2c result back to host
+    result = d.c2c_res.to_host()                                    #Copy scaled c2c result back to host
 
     
 

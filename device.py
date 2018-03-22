@@ -127,6 +127,12 @@ class Device(Shared, object):
         """
         Query the device, and print information about the 
         device name, and the amount of free and used memory.
+        
+        Notes
+        -----
+        The operating system will use device memory, which this 
+        routine reflects. Thus, seeing Free Mem < Total Mem even 
+        without any memory allocations is expected.
         """
         free = np.array([1], dtype=np.uintp)
         total = np.array([1], dtype=np.uintp)
@@ -222,4 +228,4 @@ class Device(Shared, object):
         for i in range(len(self._pinned_arrs)):
             self.host_unpin(self._pinned_arrs[0])
         self.context.__exit__()
-        self.clear()
+#        self.clear()
