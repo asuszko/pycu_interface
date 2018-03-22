@@ -20,7 +20,6 @@ from cuda_helpers import (cu_iadd,
                           cu_memcpy_h2d_async,
                           cu_memset_async,
                           cu_transpose)
-from cublas_helpers.cublas_import import cublas_axpy
 
 dtype_map={np.dtype('f4') :0,
            np.dtype('f8') :1,
@@ -112,7 +111,7 @@ class Device_Ptr(object):
                 self.avector,
                 self.stream)
         return self
- 
+
     
     def __isub__(self, b):
         """
@@ -163,7 +162,7 @@ class Device_Ptr(object):
                 self.dtype_depth,
                 self.avector,
                 self.stream)
-        return self    
+        return self
 
     
     def __call__(self):
@@ -176,10 +175,6 @@ class Device_Ptr(object):
 
     def __repr__(self):
         return repr(self.__dict__)
-    
-    
-    def _harray(self):
-        return np.empty(self.shape, self.dtype)
 
 
     def T(self, stream=None):
@@ -188,6 +183,7 @@ class Device_Ptr(object):
         with square matrices. Rectangular will be implemented in a 
         future update.
         """
+        stream = stream or self.stream
         try:
             nrows, ncols = self.shape
             cu_transpose(self.ptr,
@@ -203,7 +199,7 @@ class Device_Ptr(object):
     def d2d(self, dst, nbytes=None):
         """
         Copy memory from 'device to device'. This works both 
-        for copying memory to a separate device, or creating a 
+        for copying memory to a separate device, or for creating a 
         copy of memory on the same device.
         
         Parameters
@@ -251,7 +247,7 @@ class Device_Ptr(object):
             check_contiguous(arr)
             cu_memcpy_d2h(self.ptr, arr, nbytes)
         else:
-            tmp_arr = self._harray()
+            tmp_arr = np.empty(self.shape, self.dtype)
             cu_memcpy_d2h(self.ptr, tmp_arr, nbytes)
             return tmp_arr
             
@@ -333,7 +329,7 @@ class Device_Ptr(object):
             check_contiguous(arr)
             cu_memcpy_d2h_async(self.ptr, arr, nbytes, stream)
         else:
-            tmp_arr = self._harray()
+            tmp_arr = np.empty(self.shape, self.dtype)
             cu_memcpy_d2h_async(self.ptr, arr, nbytes, stream)
             return tmp_arr
 
@@ -391,6 +387,10 @@ class Device_Ptr(object):
 
     @property
     def avector(self):
+        """
+        Returns True if self.ptr points to a vector, and False 
+        if a scalar.
+        """
         if self.size > 1:
             return True
         else:
