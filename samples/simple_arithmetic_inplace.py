@@ -19,7 +19,7 @@ with Device() as d:
     d.b += d.a
     d.b *= d.a
     d.a -= d.b
-    d.a /= -d.b
+    d.a /= d.b
     
     #Query memory usage for fun
     d.query()
