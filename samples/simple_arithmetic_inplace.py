@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Mar 21 13:03:37 2018
-
-@author: pj8pgp
+Sample code that does in-place basic arithmetic of 
+addition, multiplication, subtraction, and division.
 """
 
 import sys
 sys.path.append("..")
 from device import Device
-
-import numpy as np
 
 
 with Device() as d:
