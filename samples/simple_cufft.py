@@ -36,9 +36,9 @@ with Device() as d:
     d.r2c_plan = d.cufft.plan(fft_extent, 'cufft_r2c')    #cuFFT r2c plan single precision (double = cufft_d2z)
     d.c2c_plan = d.cufft.plan(fft_extent, 'cufft_c2c')    #cuFFT c2c plan single precision (double = cufft_z2z)
 
-    d.gray = d.malloc(shape=gray.shape, dtype=gray.dtype, default=gray)  #Allocate space for input data and set gray array as default
+    d.gray = d.malloc(shape=gray.shape, dtype=gray.dtype, fill=gray)     #Allocate space for input data and set gray array as default
     d.r2c_res = d.malloc(shape=(ny,(nx//2+1)), dtype='c8')               #Allocate space for r2c result
-    d.r2c_full = d.malloc(shape=gray.shape, dtype='c8', default=1)       #Allocate space for full rest
+    d.r2c_full = d.malloc(shape=gray.shape, dtype='c8', fill=1+0j)       #Allocate space for full rest
     d.c2c_res = d.malloc(shape=gray.shape, dtype='c8')                   #Allocate space for c2c result
     
     d.cufft.r2c(d.r2c_plan, d.gray, d.r2c_res)                      #r2c fft

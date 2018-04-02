@@ -75,7 +75,7 @@ class Shared(Mapping, object):
         }.get(dtype, 0)
 
 
-    def malloc(self, shape, dtype, stream=None, default=None):
+    def malloc(self, shape, dtype, stream=None, fill=None):
         """
         Allocates device memory.
 
@@ -87,34 +87,18 @@ class Shared(Mapping, object):
         dtype : np.dtype
             That data type of the array.
             
-        stream: c_void_p
+        stream : c_void_p, optional
             CUDA stream to associate the returned object with.
+            
+        fill : scalar or np.ndarray, optional
+            Default value to set allocated array to.
             
         Returns
         -------
         dev_ptr: c_void_p
             Pointer to allocated device memory.
         """
-        try:
-            nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
-        except:
-            nbytes = shape*np.dtype(dtype).itemsize
-        dev_ptr = cu_malloc(nbytes)
-        dev_ptr = cast(dev_ptr, c_void_p)
-        d = Device_Ptr(dev_ptr, shape, dtype, stream)
-        
-        if default is not None:
-            if isinstance(default, (int, float, complex)):
-                d.to_device(np.full(shape, default, dtype=dtype))
-            elif type(default) in [list,tuple]:
-                tmp_arr = np.array(default, dtype=dtype)
-                d.to_device(tmp_arr, tmp_arr.nbytes)
-            else:
-                if default.dtype != np.dtype(dtype):
-                    default = default.astype(dtype)
-                    warnings.warn("Data type mismatch between default dtype and device array dtype... forcing device dtype.")
-                d.to_device(default, default.nbytes)
-        return d
+        return Device_Ptr(shape, dtype, stream, fill)
 
 
     def malloc_3d(self, channel, extent, layered=False):

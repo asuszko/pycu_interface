@@ -12,8 +12,8 @@ from device import Device
 with Device() as d:
 
     # Allocating two complex arrays, with default fill value
-    d.a = d.malloc((768,512), dtype='c16', default=3j+5)
-    d.b = d.malloc(d.a.shape, dtype='c16', default=1j+16)
+    d.a = d.malloc((768,512), dtype='c16', fill=3j+5)
+    d.b = d.malloc(d.a.shape, dtype='c16', fill=1j+16)
     
     # Some simple in-place arithmetic
     d.b += d.a
