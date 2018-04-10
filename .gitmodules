@@ -4,3 +4,6 @@
 [submodule "cufft_helpers"]
 	path = cufft_helpers
 	url = https://github.com/asuszko/cufft_helpers.git
+[submodule "cublas_helpers"]
+	path = cublas_helpers
+	url = https://github.com/asuszko/cublas_helpers.git
