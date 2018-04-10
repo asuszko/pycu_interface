@@ -100,11 +100,11 @@ class Device_Ptr(object):
                 del tmp_arr
             elif type(fill) == type(self):
                 self.d2d(src=fill, dst=self)
-            else:
-                if fill.dtype != self.dtype:
-                    fill = fill.astype(dtype)
-                    warnings.warn("Data type mismatch between default dtype and device array dtype... forcing device dtype.")
+            elif type(fill) == np.ndarray:
+                fill = np.require(fill, dtype=self.dtype, requirements='C')
                 self.to_device(fill, fill.nbytes)
+            else:
+                raise TypeError('Unsupported fill value or type input')
 
     
     def __call__(self):

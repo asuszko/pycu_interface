@@ -18,6 +18,7 @@ from cuda_helpers import (cu_create_channel_char,
                           cu_malloc_3d,
                           cu_malloc_managed)
 from dev_ptr import Device_Ptr
+from uni_ptr import Unified_Ptr
 from shared_utils import Mapping
 
 
@@ -135,7 +136,7 @@ class Shared(Mapping, object):
         return dev_ptr
     
     
-    def malloc_unified(self, shape, dtype, default=None):
+    def malloc_unified(self, shape, dtype, stream=None, fill=None):
         """
         Allocates unified memory.
 
@@ -153,27 +154,4 @@ class Shared(Mapping, object):
             Unified memory space represented by the host 
             portion as a NumPy array.
         """
-        try:
-            nbytes = reduce(mul,shape)*np.dtype(dtype).itemsize
-        except:
-            nbytes = shape*np.dtype(dtype).itemsize
-        dev_ptr = cu_malloc_managed(nbytes)
-        arr = np.ctypeslib.as_array(cast(dev_ptr,
-                                         np.ctypeslib.ndpointer(dtype,
-                                                                shape=shape,
-                                                                flags='C')))
-        dev_ptr = cast(dev_ptr, c_void_p)
-        d = Device_Ptr(dev_ptr, shape, dtype)
-        
-        if default is not None:
-            if isinstance(default, (int, float, complex)):
-                d.to_device(np.full(shape, default, dtype=dtype))
-            elif type(default) in [list,tuple]:
-                tmp_arr = np.array(default, dtype=dtype)
-                d.to_device(tmp_arr, tmp_arr.nbytes)
-            else:
-                if default.dtype != np.dtype(dtype):
-                    default = default.astype(dtype)
-                    warnings.warn("Data type mismatch between default dtype and device array dtype... forcing device dtype.")
-                d.to_device(default, default.nbytes)
-        return Mapping(h=arr, d=d)
+        return Unified_Ptr(shape, dtype, stream, fill)
