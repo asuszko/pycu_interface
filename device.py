@@ -15,7 +15,8 @@ from cuctx import cuCtx                #Context specific calls
 from shared import (get_nbytes,
                     Shared)            #Shared calls between Device and Stream
 from stream import Stream              #Stream specific calls
-
+from dev_ptr import Device_Ptr
+from uni_ptr import Unified_Ptr
 
 from cublas_helpers import cublas
 from cufft_helpers.cufft import cufft
@@ -78,6 +79,58 @@ class Device(Shared, object):
         self._pinned_arrs = []
         self._props = cu_device_props(self._id)
         self._streams = [Stream(self, i) for i in range(n_streams)]
+
+
+    def malloc(self, shape, dtype, fill=None, stream=None):
+        """
+        Allocates device memory.
+
+        Parameters
+        ----------
+        shape : tuple
+            The shape of the array to allocate.
+            
+        dtype : np.dtype
+            That data type of the array.
+            
+        fill : scalar or np.ndarray, optional
+            Default value to set allocated array to.
+            
+        stream : c_void_p, optional
+            CUDA stream to associate the returned object with.
+            
+        Returns
+        -------
+        Device_Ptr : Device_Ptr
+            The object that holds the pointer to the memory.
+        """
+        return Device_Ptr(shape, dtype, fill, stream)
+
+
+    def malloc_unified(self, shape, dtype, fill=None, stream=None):
+        """
+        Allocates unified memory.
+
+       Parameters
+        ----------
+        shape : tuple
+            The shape of the array to allocate.
+            
+        dtype : np.dtype
+            That data type of the array.
+            
+        fill : scalar or np.ndarray, optional
+            Default value to set allocated array to.
+            
+        stream : c_void_p, optional
+            CUDA stream to associate the returned object with.
+            
+        Returns
+        -------
+        Device_Ptr : Device_Ptr
+            The object that holds the pointer to the unified memory.
+        """
+        return Unified_Ptr(shape, dtype, stream, fill)
 
 
     def host_pin(self, arr, nbytes=None):
@@ -228,4 +281,4 @@ class Device(Shared, object):
         for i in range(len(self._pinned_arrs)):
             self.host_unpin(self._pinned_arrs[0])
         self.context.__exit__()
-#        self.clear()
+        self.clear()

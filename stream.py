@@ -54,12 +54,38 @@ class Stream(Shared, object):
         self._cufft = cufft(self.stream)
 
 
+    def malloc(self, shape, dtype, stream=None, fill=None):
+        """
+        Allocates device memory.
+
+        Parameters
+        ----------
+        shape : tuple
+            The shape of the array to allocate.
+            
+        dtype : np.dtype
+            That data type of the array.
+
+        fill : scalar or np.ndarray, optional
+            Default value to set allocated array to.
+            
+        stream : c_void_p, optional
+            CUDA stream to associate the returned object with.
+            
+        Returns
+        -------
+        dev_ptr: c_void_p
+            Pointer to allocated device memory.
+        """
+        stream = stream or self.stream
+        return self.device.malloc(shape, dtype, fill, stream)
+
+
     def sync(self):
         """
         Block the host thread until the stream has completed its task.
         """
         cu_sync_stream(self.stream)
-        return
 
 
     @property

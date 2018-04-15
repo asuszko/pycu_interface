@@ -55,7 +55,7 @@ def check_input(a,b):
 
 class Device_Ptr(object):
     
-    def __init__(self, shape, dtype, stream=None, fill=None):
+    def __init__(self, shape, dtype, fill=None, stream=None):
         """
         Allocates device memory, holds important information, 
         and provides useful operations.
@@ -67,13 +67,13 @@ class Device_Ptr(object):
             
         dtype : np.dtype
             That data type of the array.
-            
-        stream : c_void_p
-            CUDA stream to associate the returned object with.
-            
+
         fill : scalar, np.ndarray, or Device_Ptr, optional
             Default value to fill in allocated memory space. If 
             None, then the memory is allocated with zeros.
+            
+        stream : c_void_p
+            CUDA stream to associate the returned object with.
         """
         
         self.shape = shape

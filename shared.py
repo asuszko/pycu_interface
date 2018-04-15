@@ -76,32 +76,6 @@ class Shared(Mapping, object):
         }.get(dtype, 0)
 
 
-    def malloc(self, shape, dtype, stream=None, fill=None):
-        """
-        Allocates device memory.
-
-        Parameters
-        ----------
-        shape : tuple
-            The shape of the array to allocate.
-            
-        dtype : np.dtype
-            That data type of the array.
-            
-        stream : c_void_p, optional
-            CUDA stream to associate the returned object with.
-            
-        fill : scalar or np.ndarray, optional
-            Default value to set allocated array to.
-            
-        Returns
-        -------
-        dev_ptr: c_void_p
-            Pointer to allocated device memory.
-        """
-        return Device_Ptr(shape, dtype, stream, fill)
-
-
     def malloc_3d(self, channel, extent, layered=False):
 
         """
@@ -134,24 +108,3 @@ class Shared(Mapping, object):
         dev_ptr = cu_malloc_3d(channel, extent, layered)
         dev_ptr = cast(dev_ptr, c_void_p)
         return dev_ptr
-    
-    
-    def malloc_unified(self, shape, dtype, stream=None, fill=None):
-        """
-        Allocates unified memory.
-
-        Parameters
-        ----------
-        shape : tuple
-            The shape of the array to allocate.
-            
-        dtype : np.dtype
-            That data type of the array.
-            
-        Returns
-        -------
-        arr : np.ndarray
-            Unified memory space represented by the host 
-            portion as a NumPy array.
-        """
-        return Unified_Ptr(shape, dtype, stream, fill)

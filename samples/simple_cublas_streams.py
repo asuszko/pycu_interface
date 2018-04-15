@@ -43,16 +43,15 @@ with Device(n_streams=streams) as d:
     ## Mallocs are always synchronous, and should be done in their own loop to
     ## avoid synchorizing the otherwise async stream methods
     for s in d.streams:
-        stream = s.stream
-        s.a = s.malloc(a[0].shape, a.dtype, stream)
-        s.b = s.malloc(b[0].shape, b.dtype, stream)
+        s.a = s.malloc(a[0].shape, a.dtype)
+        s.b = s.malloc(b[0].shape, b.dtype)
 
     # Running the stream async operations    
     for stream_id, s in enumerate(d.streams):
         s.a.to_device_async(a[stream_id])
         s.b.to_device_async(b[stream_id])
-        s.cublas.axpy(2., s.a, s.b)            #ax plus y
-        s.cublas.scal(2., s.b)                 #scale matrix by alpha
+        s.cublas.axpy(2., s.a, s.b)               #ax plus y
+        s.cublas.scal(2., s.b)                    #scale matrix by alpha
         nrms[stream_id] = s.cublas.nrm2(s.b)      #norm (result is automatically copied back to host)
         s.sync()
 
