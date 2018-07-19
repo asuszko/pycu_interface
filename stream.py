@@ -54,7 +54,7 @@ class Stream(Shared, object):
         self._cufft = cufft(self.stream)
 
 
-    def malloc(self, shape, dtype, stream=None, fill=None):
+    def malloc(self, shape, dtype=None, stream=None, fill=None):
         """
         Allocates device memory.
 
@@ -78,6 +78,7 @@ class Stream(Shared, object):
             Pointer to allocated device memory.
         """
         stream = stream or self.stream
+        dtype = dtype or self.device._default_dtype
         return self.device.malloc(shape, dtype, fill, stream)
 
 

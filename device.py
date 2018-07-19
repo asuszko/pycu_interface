@@ -30,7 +30,8 @@ from cuda_helpers import (cu_device_reset,
 
 class Device(Shared, object):
 
-    def __init__(self, device_id=0, n_streams=0):
+    def __init__(self, device_id=0, n_streams=0,
+                 default_dtype='f4'):
         """
         CUDA device object. This object opens up, stores, and 
         controls a CUDA context. When the object is destroyed, 
@@ -44,6 +45,9 @@ class Device(Shared, object):
 
         n_streams : int or list of ints, optional
             Number of CUDA streams per device object.
+            
+        default_dtype : np.dtype
+            Default data type to use in mallocs.
 
         Attributes
         ----------
@@ -76,12 +80,13 @@ class Device(Shared, object):
         self._context = cuCtx(self)
         self._cublas = cublas()
         self._cufft = cufft()
+        self._default_dtype = np.dtype(default_dtype)
         self._pinned_arrs = []
         self._props = cu_device_props(self._id)
         self._streams = [Stream(self, i) for i in range(n_streams)]
 
 
-    def malloc(self, shape, dtype, fill=None, stream=None):
+    def malloc(self, shape, dtype=None, fill=None, stream=None):
         """
         Allocates device memory.
 
@@ -104,14 +109,15 @@ class Device(Shared, object):
         Device_Ptr : Device_Ptr
             The object that holds the pointer to the memory.
         """
+        dtype = dtype or self._default_dtype
         return Device_Ptr(shape, dtype, fill, stream)
 
 
-    def malloc_unified(self, shape, dtype, fill=None, stream=None):
+    def malloc_unified(self, shape, dtype=None, fill=None, stream=None):
         """
         Allocates unified memory.
 
-       Parameters
+        Parameters
         ----------
         shape : tuple
             The shape of the array to allocate.
@@ -130,6 +136,7 @@ class Device(Shared, object):
         Device_Ptr : Device_Ptr
             The object that holds the pointer to the unified memory.
         """
+        dtype = dtype or self._default_dtype
         return Unified_Ptr(shape, dtype, stream, fill)
 
 
@@ -174,7 +181,15 @@ class Device(Shared, object):
                 break
             else:
                 print("Exception: Array not found in pinned memory")
-        
+
+   
+    def host_unpin_all(self):
+        """
+        Remove the page-lock from all pinned host memory.
+        """
+        for i in range(len(self._pinned_arrs)):
+            self.host_unpin(self._pinned_arrs[0])
+     
    
     def query(self):
         """
@@ -278,7 +293,6 @@ class Device(Shared, object):
         pinned are unpinned.
         """
         self.sync()
-        for i in range(len(self._pinned_arrs)):
-            self.host_unpin(self._pinned_arrs[0])
+        self.host_unpin_all()
         self.context.__exit__()
         self.clear()

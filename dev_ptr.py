@@ -11,12 +11,14 @@ import warnings
 
 from cuda_helpers import (cu_conj,
                           cu_free,
+                          cu_iabs,
                           cu_iadd_val,
                           cu_iadd_vec,
                           cu_idiv_val,
                           cu_idiv_vec,
                           cu_imul_val,
                           cu_imul_vec,
+                          cu_ipow,
                           cu_isub_val,
                           cu_isub_vec,
                           cu_malloc,
@@ -112,12 +114,37 @@ class Device_Ptr(object):
     
     
     def __len__(self):
-        return self.size
+        return self.shape[0]
 
 
     def __repr__(self):
         return repr(self.__dict__)
         
+
+    def __abs__(self):
+        """
+        Takes the absolute value of each element in-place. Note that 
+        the original memory layout of is preserved, so the result is 
+        stored in the real component of the vector or matrix. If accessing 
+        as a type single, the stride of consecutive elements will be 2.
+        
+        Parameters
+        ----------
+        b : Device_Ptr
+            Device pointer object to store 
+        
+        Returns
+        -------
+        self : Device_Ptr
+            Returns self with updated values in self.ptr
+        """
+        cu_iabs(self.ptr,
+                self.size,
+                dtype_map[self.dtype],
+                self.dtype_depth,
+                self.stream)
+        return self
+
 
     def __iadd__(self, b):
         """
@@ -262,6 +289,14 @@ class Device_Ptr(object):
             raise TypeError("Invalid type in _imul_")
         return self
 
+    
+    def __pow__(self, b):
+        
+        cu_ipow(self.ptr, self.size, b,
+                dtype_map[self.dtype],
+                self.stream)
+        return self
+
 
     def T(self, stream=None):
         """
@@ -286,7 +321,7 @@ class Device_Ptr(object):
         """
         Take and return the complex conjugate.
         """
-        if self.dtype == (np.dtype('c8') or np.dtype('c16')):
+        if self.dtype in [np.dtype('c8'), np.dtype('c16')]:
             stream = stream or self.stream
             if inplace:
                 cu_conj(self.ptr, self.size, dtype_map[self.dtype], stream)
@@ -373,7 +408,10 @@ class Device_Ptr(object):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        nbytes = min([self.nbytes, nbytes or self.nbytes])
+        if arr.dtype != self.dtype:
+            warnings.warn("Dtype mismatch copying host array to device, forcing device type.")
+            arr = arr.astype(self.dtype)
+        nbytes = min([self.nbytes, nbytes or self.nbytes, arr.nbytes])
         check_contiguous(arr)
         cu_memcpy_h2d(self.ptr, arr, nbytes)
         
@@ -461,7 +499,10 @@ class Device_Ptr(object):
         nbytes : int, optional
             Size to transfer in bytes.
         """
-        nbytes = min([self.nbytes, nbytes or self.nbytes])
+        if arr.dtype != self.dtype:
+            warnings.warn("Dtype mismatch copying host array to device, forcing device type.")
+            arr = arr.astype(self.dtype)
+        nbytes = min([self.nbytes, nbytes or self.nbytes, arr.nbytes])
         stream = stream or self.stream
         check_contiguous(arr)
         cu_memcpy_h2d_async(self.ptr, arr, nbytes, stream)
