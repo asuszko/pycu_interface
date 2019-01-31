@@ -11,23 +11,23 @@ cublas routine itself.
 
 The numpy equivalent is:
 nrms = np.linalg.norm(alpha*(alpha*a+b), axis=1)
-
-Correct result is:
-Norm from stream 0: 72.938332
-Norm from stream 1: 193.183853
 """
 
+import os
 import sys
 import numpy as np
 
-sys.path.append("..")
+dir_path = os.path.dirname(os.path.realpath(__file__))
+upone_path = os.path.dirname(dir_path)
+sys.path.append(upone_path)
+
 from device import Device
 
-vec_len = 20
+vec_len = 32*320*320
 streams = 2
 
 # Sample data
-a = np.arange(0,vec_len,1).reshape(streams,vec_len//streams).astype('f4')
+a = np.arange(0,vec_len,1).reshape(streams,vec_len//streams).astype('c16')
 b = np.ones(a.shape,a.dtype)
 
 # Pre allocated space for the result

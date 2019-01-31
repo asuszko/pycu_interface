@@ -16,9 +16,12 @@ import sys
 import numpy as np
 from scipy import misc
 from matplotlib.pylab import plt
+import os
 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+upone_path = os.path.dirname(dir_path)
+sys.path.append(upone_path)
 
-sys.path.append("..")
 from device import Device
 
 

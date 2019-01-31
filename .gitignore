@@ -23,7 +23,10 @@ devices.py
 
 # Compiled source #
 ###################
+*.so
+*.dll
 *.exp
+*.lib
 *.exe
 *.out
 *.pyo

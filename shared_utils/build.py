@@ -12,7 +12,7 @@ import subprocess
 
 def nvcc_call(wd, name, sources,
               arch="sm_30",
-              compile_args=["-m64", "-Xcompiler", "-std=c++11"],
+              compile_args=["-m64", "-std=c++11", "-Xcompiler", "-fPIC"],
               cc_bin=None,
               include_dirs=[],
               library_dirs=[],
@@ -72,12 +72,14 @@ def build(module_path, so_name, arch="sm_30", cc_bin=None):
         
         # Compile into shared library
         os.chdir(src_path)
+
         nvcc_call(wd=src_path,
                   name=os.path.join(lib_path,so_name),
                   sources=glob.glob("*.cu"),
                   arch=arch,
                   cc_bin=cc_bin,
                   libraries=["cuda", "cublas", "cufft"])
+
         
         #Cleanup extra compile files
         filelist = glob.glob(os.path.join(lib_path, "*.exp"))
