@@ -15,12 +15,14 @@ sys.path.append(rdr_path)
 from device import Device
 
 # Sample data
-a_shape = (64,128,128)
-b_shape = (64,128,128)
-c_shape = (64,128,128)
+a_shape = (1280,512,512)
+b_shape = (1280,512,512)
+c_shape = (1280,512,512)
 
-a = np.arange(0,reduce(mul,a_shape),1).reshape(a_shape).astype('c16')
-b = np.arange(0,reduce(mul,b_shape),1).reshape(b_shape).astype('c16')
+a = np.arange(0,reduce(mul,a_shape),1).reshape(a_shape).astype('c8')
+a += np.random.random(a.shape)
+b = np.arange(0,reduce(mul,b_shape),1).reshape(b_shape).astype('c8')
+b += np.random.random(a.shape)
 
 # Initialize the Device object on the default device(0) with 2 streams
 with Device() as d:
